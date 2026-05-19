@@ -92,7 +92,8 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:#f0f4f8; color:#1a234
 .tbl-scroll { overflow-x:auto;-webkit-overflow-scrolling:touch; }
 table { width:100%;border-collapse:collapse; }
 thead { background:#f8fafc; }
-th { padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#6b7280;white-space:nowrap;border-bottom:2px solid #f1f5f9;user-select:none; }
+th { padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#6b7280;white-space:nowrap;border-bottom:2px solid #f1f5f9;user-select:none;cursor:pointer; }
+th:hover { color:#374151; }
 th.sorted { color:#0891b2; }
 th.th-media { background:#eff6ff; }
 th.th-actual { background:#f0fdf4; }
@@ -267,13 +268,13 @@ tr:hover td { background:#fafafa; }
   <table>
     <thead>
       <tr>
-        <th># Tỉnh / Thành Phố</th>
-        <th class="th-media" style="text-align:right">Impressions</th>
-        <th class="th-media" style="text-align:right">Clicks</th>
-        <th class="th-media" style="text-align:right">CTR</th>
-        <th class="th-actual col-divider" style="text-align:right">Doanh Thu</th>
-        <th class="th-actual" style="text-align:right">SL Đơn</th>
-        <th class="th-actual sorted" style="text-align:right">SL Khách ↓</th>
+        <th onclick="sortTable('region')" id="th-region"># Tỉnh / Thành Phố <span class="si"></span></th>
+        <th class="th-media" onclick="sortTable('impressions')" id="th-impressions" style="text-align:right">Impressions <span class="si"></span></th>
+        <th class="th-media" onclick="sortTable('clicks')" id="th-clicks" style="text-align:right">Clicks <span class="si"></span></th>
+        <th class="th-media" onclick="sortTable('cr')" id="th-cr" style="text-align:right">CTR <span class="si"></span></th>
+        <th class="th-actual col-divider" onclick="sortTable('revenue')" id="th-revenue" style="text-align:right">Doanh Thu <span class="si"></span></th>
+        <th class="th-actual" onclick="sortTable('orders')" id="th-orders" style="text-align:right">SL Đơn <span class="si"></span></th>
+        <th class="th-actual sorted" onclick="sortTable('kh_actual')" id="th-kh_actual" style="text-align:right">SL Khách <span class="si">↓</span></th>
       </tr>
     </thead>
     <tbody id="table-body"></tbody>
@@ -494,8 +495,22 @@ function filterTable(){
 }
 
 function sortTable(col){
-  // Sort cố định theo SL Khách hàng từ cao đến thấp
-  sortCol='kh_actual';sortDir=-1;
+  if(sortCol===col) sortDir=-sortDir;
+  else { sortCol=col; sortDir=-1; }
+  // Reset tất cả headers
+  const cols=['region','impressions','clicks','cr','revenue','orders','kh_actual'];
+  cols.forEach(c=>{
+    const th=document.getElementById('th-'+c);
+    if(!th)return;
+    th.classList.remove('sorted');
+    th.querySelector('.si').textContent='';
+  });
+  // Highlight cột đang sort
+  const activeTh=document.getElementById('th-'+col);
+  if(activeTh){
+    activeTh.classList.add('sorted');
+    activeTh.querySelector('.si').textContent=sortDir===-1?'↓':'↑';
+  }
   renderTable();
 }
 
